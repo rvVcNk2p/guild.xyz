@@ -1,6 +1,11 @@
 import { createContext, useContext, useReducer } from "react"
 import { GuildBase } from "types"
 
+export enum Puzzles {
+  PAIRING = "pairing",
+  LOGO = "logo",
+}
+
 export enum Difficulties {
   EASY = "easy",
   MEDIUM = "medium",
@@ -8,25 +13,33 @@ export enum Difficulties {
 }
 
 export const PuzzleLength = {
-  [Difficulties.EASY]: 2,
-  [Difficulties.MEDIUM]: 4,
-  [Difficulties.HARD]: 5,
+  [Difficulties.EASY]: 20,
+  [Difficulties.MEDIUM]: 500,
+  [Difficulties.HARD]: 1000,
 }
 
 type DifficultyType = (typeof Difficulties)[keyof typeof Difficulties]
+type PuzzleType = (typeof Puzzles)[keyof typeof Puzzles]
+
+export type Puzzle = {
+  guilds: [GuildBase, GuildBase, GuildBase, GuildBase]
+  type: PuzzleType
+}
 
 type GameType = {
-  remainingGuilds: GuildBase[]
+  puzzles: Puzzle[]
   isGame: boolean
   difficulty: DifficultyType
+  activeStep: number
   currentScore: number | null
   highscore: number | null
 }
 
 const initialGameState: GameType = {
-  remainingGuilds: [],
+  puzzles: [],
   isGame: false,
   difficulty: Difficulties.EASY,
+  activeStep: 0,
   currentScore: null,
   highscore: null,
 }
@@ -58,20 +71,22 @@ export function useGameDispatch() {
 function gameReducer(game: GameType, action) {
   switch (action.type) {
     case "start": {
-      const { difficulty, remainingGuilds } = action
+      const { difficulty, puzzles } = action
 
       return {
         ...game,
         isGame: true,
         currentScore: 0,
         difficulty,
-        remainingGuilds,
+        puzzles,
       }
     }
     case "increment": {
+      // TODO: end the game
       return {
         ...game,
-        currentScore: game.currentScore + action.value, // TODO: +1 or +2, depends
+        currentScore: game.currentScore + action.value,
+        activeStep: ++game.activeStep,
       }
     }
     case "restart": {

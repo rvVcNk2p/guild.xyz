@@ -1,9 +1,11 @@
 import { DndContext, DragEndEvent } from "@dnd-kit/core"
 import { useState } from "react"
 
-import { HStack } from "@chakra-ui/react"
-import { Draggable } from "./teeest/Draggable"
-import { Droppable } from "./teeest/Droppable"
+import { Button, HStack } from "@chakra-ui/react"
+import { useGameDispatch } from "components/guess-the-guild/GameContext"
+import ScoreHeader from "../ScoreHeader"
+import { Draggable } from "../teeest/Draggable"
+import { Droppable } from "../teeest/Droppable"
 
 export default function PairingGame() {
   const containers = ["A", "B", "C", "D"]
@@ -60,19 +62,37 @@ export default function PairingGame() {
     setParent(updatedParent)
   }
 
-  return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <HStack gap={4} mb={10}>
-        {Object.keys(parent).map((key: string) =>
-          parent[key] === null ? draggableMarkup(key) : <div key={key}>DEFAULT</div>
-        )}
-      </HStack>
+  const dispatch = useGameDispatch()
 
-      {containers.map((id) => (
-        <Droppable key={id} id={id}>
-          {getActiveDraggableElement(id)}
-        </Droppable>
-      ))}
-    </DndContext>
+  return (
+    <>
+      <ScoreHeader />
+
+      <DndContext onDragEnd={handleDragEnd}>
+        <HStack gap={4} mb={10}>
+          {Object.keys(parent).map((key: string) =>
+            parent[key] === null ? (
+              draggableMarkup(key)
+            ) : (
+              <div key={key}>DEFAULT</div>
+            )
+          )}
+        </HStack>
+
+        {containers.map((id) => (
+          <Droppable key={id} id={id}>
+            {getActiveDraggableElement(id)}
+          </Droppable>
+        ))}
+
+        <Button
+          variant="solid"
+          size="md"
+          onClick={() => dispatch({ type: "increment", value: 2 })}
+        >
+          Submit
+        </Button>
+      </DndContext>
+    </>
   )
 }
