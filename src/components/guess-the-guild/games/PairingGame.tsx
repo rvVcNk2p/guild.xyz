@@ -1,45 +1,94 @@
 import { DndContext, DragEndEvent } from "@dnd-kit/core"
 import { useState } from "react"
 
-import { Button, HStack } from "@chakra-ui/react"
-import { useGameDispatch } from "components/guess-the-guild/GameContext"
+import {
+  Button,
+  Center,
+  Circle,
+  HStack,
+  Image,
+  SkeletonCircle,
+  Text,
+  VStack,
+} from "@chakra-ui/react"
+import { GuildBase } from "types"
 import ScoreHeader from "../ScoreHeader"
-import { Draggable } from "../teeest/Draggable"
-import { Droppable } from "../teeest/Droppable"
+import Draggable from "../drag-and-drop/Draggable"
+import DroppableCard from "../drag-and-drop/DroppableCard"
+import { GameType } from "../useGame"
 
-export default function PairingGame() {
-  const containers = ["A", "B", "C", "D"]
+type Props = {
+  guilds: GuildBase[]
+  game: GameType
+  evaluate: (value: number) => void
+  next: () => void
+}
 
-  const [parent, setParent] = useState({
-    first: null,
-    second: null,
-    third: null,
-    forth: null,
-  })
+type StateType = {
+  [key: number]: null
+}
 
-  const draggableMarkup = (key: string) => (
-    <Draggable id={`draggable-${key}`} key={key}>
-      <p>Drag me - {key}</p>
+export const emptyImage = (key: number) => (
+  <Circle
+    key={key}
+    size="68px"
+    bg="transparent"
+    bgImage='url("/default_circle.svg")'
+  />
+)
+
+const generateState = (guilds: GuildBase[]): StateType => {
+  const ids = guilds.map((guild) => guild.id)
+  return ids.reduce((acc: any, nextVal: number) => {
+    acc[nextVal] = null
+    return acc
+  }, {})
+}
+
+const getGuildById = (guilds: GuildBase[], id: number) => {
+  for (let i = 0; i < guilds.length; i++) {
+    if (guilds[i].id == id) {
+      return guilds[i]
+    }
+  }
+
+  return null
+}
+
+const PairingGame = ({ guilds, game, evaluate, next }: Props): JSX.Element => {
+  const droppableElementIds = guilds.map((guild) => guild.id)
+
+  const [state, setState] = useState<StateType>(generateState(guilds))
+
+  const isDisabled = () => Object.values(state).every((value) => value !== null)
+
+  const draggableMarkup = (id: number) => (
+    <Draggable id={`draggable-${id}`} key={id}>
+      <Image
+        width={68}
+        height={68}
+        rounded="full"
+        src={getGuildById(guilds, id)?.imageUrl}
+        fallback={<SkeletonCircle size="68" />}
+        alt="Guild Icon"
+      />
     </Draggable>
   )
 
-  const getActiveDraggableElement = (id: string) => {
-    // TODO: Refactor
-    if (parent.first === id) {
-      return draggableMarkup("first")
-    } else if (parent.second === id) {
-      return draggableMarkup("second")
-    } else if (parent.third === id) {
-      return draggableMarkup("third")
-    } else if (parent.forth === id) {
-      return draggableMarkup("forth")
-    } else return `${id} - Drop here`
+  const getActiveDraggableElement = (id: number) => {
+    for (const key in state) {
+      if (state.hasOwnProperty(key) && state[key] === id) {
+        return draggableMarkup(+key)
+      }
+    }
+
+    return emptyImage(id)
   }
 
   const getSameActiveKey = (id: string): null | string =>
-    Object.entries(parent).reduce((acc: string, nextval) => {
+    Object.entries(state).reduce((acc: string, nextval) => {
       const [key, value] = nextval
-      if (value === id) {
+      if (value == id) {
         acc = key
       }
       return acc
@@ -47,52 +96,92 @@ export default function PairingGame() {
 
   const handleDragEnd = (event: DragEndEvent): void => {
     const { over, active } = event
-    let updatedParent = { ...parent }
+    let updatedState = { ...state }
 
     const draggable = active.id.toString().split("-")[1]
-    updatedParent = { ...updatedParent, [draggable]: over ? over.id : null }
+    updatedState = { ...updatedState, [draggable]: over ? over.id : null }
 
     if (over?.id) {
       const sameActive = getSameActiveKey(over.id.toString())
       if (sameActive) {
-        updatedParent = { ...updatedParent, [sameActive]: null }
+        updatedState = { ...updatedState, [sameActive]: null }
       }
     }
 
-    setParent(updatedParent)
+    setState(updatedState)
   }
 
-  const dispatch = useGameDispatch()
+  const [validationState, setValidationState] = useState([null, null, null, null])
+
+  const isEvaluationCompleted = () =>
+    Object.values(validationState).every((value) => value !== null)
+
+  const evaluateState = (): void => {
+    const validationArray = Object.entries(state).reduce(
+      (acc: boolean[], [key, value]) => {
+        acc.push(key == value)
+        return acc
+      },
+      []
+    )
+
+    const isResultValid = validationArray.every((entry) => entry)
+
+    setValidationState(validationArray)
+
+    evaluate(isResultValid ? 2 : 0)
+  }
 
   return (
     <>
-      <ScoreHeader />
+      <ScoreHeader game={game} />
 
       <DndContext onDragEnd={handleDragEnd}>
-        <HStack gap={4} mb={10}>
-          {Object.keys(parent).map((key: string) =>
-            parent[key] === null ? (
-              draggableMarkup(key)
-            ) : (
-              <div key={key}>DEFAULT</div>
-            )
-          )}
-        </HStack>
+        <Center flexDir={"column"} pb="10" textAlign={"center"}>
+          <Text mb="6" fontSize={{ base: "xl", md: "2xl", lg: "3xl" }} as="b">
+            Pair the logos to their guilds
+          </Text>
 
-        {containers.map((id) => (
-          <Droppable key={id} id={id}>
-            {getActiveDraggableElement(id)}
-          </Droppable>
-        ))}
+          <HStack gap={4} flex="1" justifyContent="center">
+            {Object.keys(state).map((key: string) =>
+              state[key] === null ? draggableMarkup(+key) : emptyImage(+key)
+            )}
+          </HStack>
+        </Center>
 
-        <Button
-          variant="solid"
-          size="md"
-          onClick={() => dispatch({ type: "increment", value: 2 })}
-        >
-          Submit
-        </Button>
+        <VStack gap={2} mb={10} flex="1" justifyContent="start" alignItems="start">
+          {droppableElementIds.map((id, idx) => (
+            <DroppableCard
+              key={id}
+              guild={getGuildById(guilds, id)}
+              isCorrect={validationState[idx]}
+            >
+              {getActiveDraggableElement(id)}
+            </DroppableCard>
+          ))}
+        </VStack>
+
+        {isEvaluationCompleted() ? (
+          <Button
+            variant="solid"
+            colorScheme="gray"
+            size="md"
+            onClick={() => next()}
+          >
+            Next
+          </Button>
+        ) : (
+          <Button
+            colorScheme="green"
+            isDisabled={!isDisabled()}
+            onClick={evaluateState}
+          >
+            Submit
+          </Button>
+        )}
       </DndContext>
     </>
   )
 }
+
+export default PairingGame

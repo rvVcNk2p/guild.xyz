@@ -1,8 +1,13 @@
 import { Flex, Spacer, Text } from "@chakra-ui/react"
-import { useGame } from "components/guess-the-guild/GameContext"
+import useLocalStorage from "hooks/useLocalStorage"
+import { GameType } from "./useGame"
 
-const ScoreHeader = () => {
-  const game = useGame()
+type Props = {
+  game: GameType
+}
+
+const ScoreHeader = ({ game }: Props) => {
+  const [record] = useLocalStorage("record", null)
 
   const currentScore = game.currentScore !== null ? game.currentScore : "-"
   const activeStep =
@@ -11,10 +16,12 @@ const ScoreHeader = () => {
     game.isGame && game.puzzles?.length > 0 ? game.puzzles?.length : "-"
 
   return (
-    <Flex minWidth="max-content" mb={4}>
-      <Text fontSize="sm">{activeStep + " / " + puzzleCount}</Text>
+    <Flex justifyContent="center" mb={10}>
+      <Text fontSize="sm">Record: {record ?? "-"}</Text>
       <Spacer />
       <Text fontSize="sm">Current score: {currentScore}</Text>
+      <Spacer />
+      <Text fontSize="sm">{activeStep + " / " + puzzleCount}</Text>
     </Flex>
   )
 }
