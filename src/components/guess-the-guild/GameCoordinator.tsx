@@ -18,7 +18,7 @@ const GameCoordinator = ({ guilds: guildsInitial }: Props): JSX.Element => {
     data: [filteredGuilds],
     isValidating: isLoading,
   } = useSWR(
-    "/guild??order=members",
+    "/guild?order=members",
     (url: string) =>
       fetcher(url).then((data) => [
         data,
