@@ -5,8 +5,8 @@ import {
   Button,
   Center,
   Circle,
-  HStack,
   Image,
+  SimpleGrid,
   SkeletonCircle,
   Text,
   VStack,
@@ -63,7 +63,7 @@ const PairingGame = ({ guilds, game, evaluate, next }: Props): JSX.Element => {
   const isDisabled = () => Object.values(state).every((value) => value !== null)
 
   const draggableMarkup = (id: number) => (
-    <Draggable id={`draggable-${id}`} key={id}>
+    <Draggable id={`draggable-${id}`} key={id} style={{ zIndex: 12 }}>
       <Image
         width={68}
         height={68}
@@ -142,11 +142,13 @@ const PairingGame = ({ guilds, game, evaluate, next }: Props): JSX.Element => {
             Pair the logos to their guilds
           </Text>
 
-          <HStack gap={4} flex="1" justifyContent="center">
+          <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
+            {/* <HStack gap={4} flex="1" justifyContent="center"> */}
             {Object.keys(state).map((key: string) =>
               state[key] === null ? draggableMarkup(+key) : emptyImage(+key)
             )}
-          </HStack>
+            {/* </HStack> */}
+          </SimpleGrid>
         </Center>
 
         <VStack gap={2} mb={10} flex="1" justifyContent="start" alignItems="start">

@@ -11,8 +11,10 @@ const GameResult = ({ restart, currentScore }: Props): JSX.Element => {
 
   return (
     <Flex direction="column" alignItems="center" justifyItems="center">
-      <Heading as="h1">Congratulations! 🎉</Heading>
-      <Heading as="h2">You've completed the challenge!</Heading>
+      <Heading as="h1">Congratulations! 🎉 </Heading>
+      <Heading as="h2" textAlign="center">
+        You've completed the challenge!
+      </Heading>
       <Text mt={10} fontSize="2xl">
         Here are your final results:
       </Text>
