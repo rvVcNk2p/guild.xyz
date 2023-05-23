@@ -36,6 +36,7 @@ const DroppableCard = ({
     _before: {
       position: "relative",
     },
+    overflow: "visible",
     bg: colorMode === "light" ? "white" : "gray.600",
     py: "3",
   }
@@ -46,11 +47,13 @@ const DroppableCard = ({
   return (
     <DisplayCard {...customCardProps}>
       <SimpleGrid
-        templateColumns={true ? "6rem calc(100% - 4.25rem)" : "1fr"}
+        templateColumns={"6rem calc(100% - 4.25rem)"}
         gap={4}
         alignItems="center"
       >
-        <div ref={setNodeRef}>{children}</div>
+        <div ref={setNodeRef} style={{ zIndex: 10 }}>
+          {children}
+        </div>
         <VStack spacing={2} alignItems="start" w="full" maxW="full" mb="1" mt="-1">
           <Text
             as="span"

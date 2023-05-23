@@ -1,9 +1,9 @@
 import { Box, Button, HStack, Stack, Text } from "@chakra-ui/react"
 
+import { Difficulties, Puzzle, PuzzleLength, Puzzles } from "hooks/useGame"
 import { useState } from "react"
 import { GuildBase } from "types"
 import capitalize from "utils/capitalize"
-import { Difficulties, Puzzle, PuzzleLength, Puzzles } from "../useGame"
 
 type Props = {
   guilds: GuildBase[]

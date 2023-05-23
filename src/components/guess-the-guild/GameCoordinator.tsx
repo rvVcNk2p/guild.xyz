@@ -1,3 +1,4 @@
+import { Puzzle, Puzzles, useGame } from "hooks/useGame"
 import { GetStaticProps } from "next"
 import { useMemo } from "react"
 import useSWR from "swr"
@@ -7,7 +8,6 @@ import GameInitialization from "./control/GameInitialization"
 import GameResult from "./control/GameResult"
 import LogoGuessingGame from "./games/LogoGuessingGame"
 import PairingGame from "./games/PairingGame"
-import { Puzzle, Puzzles, useGame } from "./useGame"
 
 type Props = {
   guilds?: GuildBase[]

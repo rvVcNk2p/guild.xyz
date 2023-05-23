@@ -1,6 +1,6 @@
 import { Flex, Spacer, Text } from "@chakra-ui/react"
+import { GameType } from "hooks/useGame"
 import useLocalStorage from "hooks/useLocalStorage"
-import { GameType } from "./useGame"
 
 type Props = {
   game: GameType

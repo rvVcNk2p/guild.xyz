@@ -1,8 +1,8 @@
 import { Button, Center, Image, SkeletonCircle, Stack, Text } from "@chakra-ui/react"
+import { GameType } from "hooks/useGame"
 import { useState } from "react"
 import { GuildBase } from "types"
 import ScoreHeader from "../ScoreHeader"
-import { GameType } from "../useGame"
 
 type Props = {
   guilds: GuildBase[]

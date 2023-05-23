@@ -11,11 +11,11 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react"
+import { GameType } from "hooks/useGame"
 import { GuildBase } from "types"
 import ScoreHeader from "../ScoreHeader"
 import Draggable from "../drag-and-drop/Draggable"
 import DroppableCard from "../drag-and-drop/DroppableCard"
-import { GameType } from "../useGame"
 
 type Props = {
   guilds: GuildBase[]

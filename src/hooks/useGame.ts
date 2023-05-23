@@ -14,7 +14,7 @@ export enum Difficulties {
 }
 
 export const PuzzleLength = {
-  [Difficulties.EASY]: 20,
+  [Difficulties.EASY]: 100,
   [Difficulties.MEDIUM]: 500,
   [Difficulties.HARD]: 1000,
 }
